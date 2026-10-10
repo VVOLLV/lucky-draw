@@ -4,11 +4,24 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>幸运抽奖 · Trae on Campus</title>
+<script>
+  /* 主题初始化（须在 CSS/渲染前执行，防止主题闪烁）：localStorage > 系统偏好 > 默认深色 */
+  (function () {
+    var t = null;
+    try { t = localStorage.getItem("ld-theme"); } catch (e) {}
+    if (t !== "light" && t !== "dark") {
+      t = window.matchMedia && window.matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark";
+    }
+    document.documentElement.dataset.theme = t;
+  })();
+</script>
 <style>
   /* ============================================================
    *  Nimbus Core — tokens（内联自 colors_and_type.css，数值保持原样）
    * ============================================================ */
   :root {
+    color-scheme: dark;
+
     --radius-2: 2px;  --radius-4: 4px;  --radius-6: 6px;
     --radius-8: 8px;  --radius-10: 10px; --radius-full: 9999px;
 
@@ -111,6 +124,109 @@
   }
 
   /* ============================================================
+   *  浅色主题 —— tokens 覆写自 TraeWork Light 设计规范
+   *  品牌色由绿色 #32F08C 切换为靛紫 #4B3FE3
+   * ============================================================ */
+  :root[data-theme="light"] {
+    color-scheme: light;
+
+    /* bg */
+    --bg-base-default: #FFFFFF;
+    --bg-base-secondary: #F5F5F5;
+    --bg-base-tertiary: #E5E5E5;
+    --bg-overlay-l1: rgba(115, 115, 115, 0.08);
+    --bg-overlay-l2: rgba(115, 115, 115, 0.12);
+    --bg-overlay-l3: rgba(115, 115, 115, 0.16);
+    --bg-overlay-l4: rgba(115, 115, 115, 0.20);
+    --bg-tooltip: #FFFFFF;
+
+    /* brand（靛紫） */
+    --bg-brand: #4B3FE3;
+    --bg-brand-hover: #6A6FFF;
+    --bg-brand-disabled: rgba(75, 63, 227, 0.22);
+    --bg-brand-popup: rgba(170, 183, 255, 0.36);
+
+    /* text */
+    --text-default: #171717;
+    --text-default-hover: #262626;
+    --text-secondary: #404040;
+    --text-tertiary: #737373;
+    --text-disabled: #A1A1A1;
+    --text-onbrand: #FFFFFF;
+    --text-brand: #4B3FE3;
+
+    /* icon */
+    --icon-secondary: #404040;
+    --icon-tertiary: #737373;
+
+    /* border */
+    --border-neutral-l1: rgba(115, 115, 115, 0.12);
+    --border-neutral-l2: rgba(115, 115, 115, 0.18);
+    --border-neutral-l3: rgba(115, 115, 115, 0.36);
+    --border-brand: #4B3FE3;
+    --border-brand-l1: rgba(75, 63, 227, 0.45);
+
+    /* 极光 / 标题渐变 / 礼花：浅色模式的派生色 */
+    --brand-green-900: #E5EAFF;
+    --brand-blue-1000: #DDE6FF;
+    --status-alert-default: #FFE9C7;
+    --brand-green-400: #6A6FFF;
+    --brand-yellow-500: #E8920C;
+    --accent-amber: #F2A90C;
+  }
+
+  /* —— 浅色模式组件适配 —— */
+  /* 暗角改轻柔 */
+  :root[data-theme="light"] body::after {
+    background: radial-gradient(ellipse 88% 72% at 50% 40%, transparent 52%, rgba(26, 26, 46, 0.10) 100%);
+  }
+  /* 极光在白底上更柔更亮 */
+  :root[data-theme="light"] .orb { filter: blur(90px); }
+  :root[data-theme="light"] .orb-brand { opacity: .8; }
+  :root[data-theme="light"] .orb-blue { opacity: .75; }
+  :root[data-theme="light"] .orb-gold { opacity: .7; }
+  :root[data-theme="light"] .bg-grid { opacity: .85; }
+
+  /* 舞台卡片阴影柔化 */
+  :root[data-theme="light"] .roll-card {
+    box-shadow: 0 1px 0 var(--bg-overlay-l2) inset, 0 24px 60px rgba(38, 35, 90, 0.10);
+  }
+  :root[data-theme="light"] .roll-card.is-rolling {
+    box-shadow: 0 0 0 1px var(--glow-brand-soft), 0 0 90px var(--glow-brand-soft),
+      0 24px 60px rgba(38, 35, 90, 0.10);
+  }
+
+  /* 中奖文字：浅底改深字 */
+  :root[data-theme="light"] .roll-name.is-win {
+    color: var(--text-default);
+    text-shadow: 0 0 24px var(--glow-brand-soft), 0 0 56px var(--glow-brand-soft);
+  }
+  :root[data-theme="light"] .roll-name.is-batch > span {
+    color: var(--text-default);
+    background: #FFFFFF;
+    box-shadow: 0 0 0 1px var(--glow-brand-soft), 0 10px 26px rgba(38, 35, 90, 0.10);
+  }
+  :root[data-theme="light"] .face-front {
+    color: var(--text-default);
+    background: #FFFFFF;
+    box-shadow: 0 0 0 1px var(--glow-brand-soft), 0 8px 22px rgba(38, 35, 90, 0.10);
+  }
+  :root[data-theme="light"] .face-front .idx { color: var(--text-brand); opacity: .8; }
+  :root[data-theme="light"] .slot.is-filled .face-front::after {
+    background: linear-gradient(100deg, transparent, rgba(75, 63, 227, 0.14), transparent);
+  }
+
+  /* 侧栏 / 名单 */
+  :root[data-theme="light"] .sidebar {
+    box-shadow: 40px 0 90px rgba(38, 35, 90, 0.12);
+  }
+  :root[data-theme="light"] .sb-item.is-won {
+    color: var(--text-default);
+    background: #FFFFFF;
+    box-shadow: 0 0 0 1px var(--glow-brand-soft);
+  }
+
+  /* ============================================================
    *  组件（内联自 components.css 的 .ds-* 子集 + shared atoms）
    * ============================================================ */
   .ds-btn {
@@ -175,6 +291,7 @@
     line-height: var(--body-base-line-height);
     -webkit-font-smoothing: antialiased;
     overflow: hidden;
+    transition: background-color .32s ease, color .32s ease;
   }
 
   /* —— 背景装饰：极光光晕 + 代码网格 + 暗角 —— */
@@ -240,7 +357,7 @@
     box-shadow: 0 1px 0 var(--bg-overlay-l3) inset, 0 40px 90px rgba(0, 0, 0, .5);
     text-align: center;
     overflow: hidden;
-    transition: border-color .25s ease, box-shadow .25s ease;
+    transition: border-color .25s ease, box-shadow .25s ease, background-color .32s ease, color .32s ease;
   }
   .roll-card::before {
     content: ""; position: absolute; left: 50%; top: 0; transform: translateX(-50%);
@@ -386,6 +503,7 @@
     overflow: hidden;
     font-size: clamp(15px, 1.5vw, 21px);
     font-weight: var(--font-weight-medium);
+    transition: background-color .32s ease, border-color .32s ease, color .32s ease;
   }
   .face .idx {
     position: absolute; top: 7px; left: 9px;
@@ -455,6 +573,22 @@
   }
   .rail-toggle.is-hidden { opacity: 0; pointer-events: none; }
 
+  /* 右上角主题切换 */
+  .theme-toggle {
+    position: fixed; z-index: 6;
+    right: clamp(16px, 2.4vw, 28px); top: clamp(16px, 2.6vh, 26px);
+    width: 34px; height: 34px; padding: 0;
+    border-radius: var(--radius-8);
+    -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px);
+    display: grid; place-items: center;
+    transition: background .12s ease, border-color .12s ease;
+  }
+  .theme-toggle svg { display: none; }
+  /* 深色模式显示太阳（点一下变亮）；浅色模式显示月亮 */
+  :root:not([data-theme="light"]) .theme-toggle .ic-sun { display: block; }
+  :root[data-theme="light"] .theme-toggle .ic-moon { display: block; }
+  .theme-toggle:active { transform: scale(.92); }
+
   .scrim {
     position: fixed; inset: 0; z-index: 4;
     background: rgba(0, 0, 0, .52);
@@ -471,7 +605,8 @@
     border-right: 1px solid var(--border-neutral-l1);
     box-shadow: 40px 0 90px rgba(0, 0, 0, .55);
     transform: translateX(-102%);
-    transition: transform .34s cubic-bezier(.4, .15, .2, 1), width .34s cubic-bezier(.4, .15, .2, 1);
+    transition: transform .34s cubic-bezier(.4, .15, .2, 1), width .34s cubic-bezier(.4, .15, .2, 1),
+      background-color .32s ease;
   }
   .sidebar.is-open { transform: translateX(0); }
   /* 全屏展开 */
@@ -539,6 +674,18 @@
       <path d="M2 4h11M2 7.5h11M2 11h7" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" />
     </svg>
     <span>名单</span>
+  </button>
+
+  <button class="ds-btn ds-btn--secondary theme-toggle" id="themeToggle" aria-label="切换到浅色模式" title="切换主题">
+    <svg class="ic ic-sun" width="15" height="15" viewBox="0 0 15 15" fill="none" aria-hidden="true">
+      <circle cx="7.5" cy="7.5" r="2.8" stroke="currentColor" stroke-width="1.35" />
+      <path d="M7.5 1.2v1.6M7.5 12.2v1.6M1.2 7.5h1.6M12.2 7.5h1.6
+        M3 3l1.1 1.1M10.9 10.9L12 12M12 3l-1.1 1.1M4.1 10.9L3 12"
+        stroke="currentColor" stroke-width="1.35" stroke-linecap="round" />
+    </svg>
+    <svg class="ic ic-moon" width="15" height="15" viewBox="0 0 15 15" aria-hidden="true">
+      <path d="M13 8.9 A5.6 5.6 0 1 1 6.1 2 A4.5 4.5 0 0 0 13 8.9 Z" fill="currentColor" />
+    </svg>
   </button>
 
   <div class="scrim" id="scrim"></div>
@@ -837,11 +984,16 @@ el.resetBtn.addEventListener("click", reset);
  * ============================================================ */
 const ctx = el.fx.getContext("2d");
 const cssVar = (n) => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
-const FX_COLORS = [
-  cssVar("--brand-yellow-500"), cssVar("--accent-amber"), cssVar("--bg-brand"),
-  cssVar("--brand-green-400"), cssVar("--status-primary-default"),
-  cssVar("--accent-cyan"), cssVar("--special-white"),
-];
+// 礼花颜色每次爆发时按当前主题实时读取（浅色模式下用深彩色，白底可见）
+function fxColors() {
+  const colors = [
+    cssVar("--bg-brand"), cssVar("--brand-green-400"), cssVar("--status-primary-default"),
+    cssVar("--accent-cyan"), cssVar("--accent-amber"), cssVar("--brand-yellow-500"),
+    cssVar("--status-error-default"),
+  ];
+  if (document.documentElement.dataset.theme !== "light") colors.push(cssVar("--special-white"));
+  return colors;
+}
 
 let particles = [];
 let fxRunning = false;
@@ -853,6 +1005,7 @@ resize();
 function burst() {
   const cx = window.innerWidth / 2;
   const cy = window.innerHeight * 0.4;
+  const colors = fxColors();
   for (let i = 0; i < 140; i++) {
     const angle = Math.random() * Math.PI * 2;
     const speed = 4 + Math.random() * 11;
@@ -862,7 +1015,7 @@ function burst() {
       vx: Math.cos(angle) * speed,
       vy: Math.sin(angle) * speed - 4,
       size: 3 + Math.random() * 5,
-      color: FX_COLORS[(Math.random() * FX_COLORS.length) | 0],
+      color: colors[(Math.random() * colors.length) | 0],
       life: 1,
       decay: 0.012 + Math.random() * 0.012,
       rot: Math.random() * Math.PI,
@@ -943,6 +1096,26 @@ railExpand.addEventListener("click", () => {
   const wide = sidebar.classList.toggle("is-wide");
   railExpand.setAttribute("aria-label", wide ? "收起为侧栏" : "全屏展开");
 });
+
+/* ============================================================
+ *  7.5) 深色 / 浅色主题切换
+ * ============================================================ */
+const themeToggle = document.getElementById("themeToggle");
+
+function setTheme(t) {
+  document.documentElement.dataset.theme = t;
+  try { localStorage.setItem("ld-theme", t); } catch (e) {}
+  const light = t === "light";
+  themeToggle.setAttribute("aria-label", light ? "切换到深色模式" : "切换到浅色模式");
+  themeToggle.title = light ? "切换到深色模式" : "切换到浅色模式";
+}
+
+themeToggle.addEventListener("click", () => {
+  setTheme(document.documentElement.dataset.theme === "light" ? "dark" : "light");
+});
+
+// 同步一次按钮的初始 aria（主题本身已由 head 内联脚本写好）
+setTheme(document.documentElement.dataset.theme || "dark");
 
 /* ============================================================
  *  8) 启动
