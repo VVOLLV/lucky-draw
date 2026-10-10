@@ -1,0 +1,965 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>幸运抽奖 · Trae on Campus</title>
+<style>
+  /* ============================================================
+   *  Nimbus Core — tokens（内联自 colors_and_type.css，数值保持原样）
+   * ============================================================ */
+  :root {
+    --radius-2: 2px;  --radius-4: 4px;  --radius-6: 6px;
+    --radius-8: 8px;  --radius-10: 10px; --radius-full: 9999px;
+
+    --spacer-4: 4px;  --spacer-6: 6px;  --spacer-8: 8px;
+    --spacer-12: 12px; --spacer-16: 16px; --spacer-24: 24px;
+    --spacer-32: 32px; --spacer-40: 40px;
+
+    --font-family-default: "SF Pro Text", system-ui, -apple-system, sans-serif;
+    --font-family-heading: "SF Pro", system-ui, -apple-system, sans-serif;
+    --font-family-mono: "JetBrains Mono", ui-monospace, monospace;
+    --font-weight-medium: 500;
+    --font-weight-strong: 600;
+
+    --body-xs-font-family: "SF Pro Text", system-ui, -apple-system, sans-serif;
+    --body-xs-font-size: 10px;  --body-xs-line-height: 14px;
+    --body-sm-font-family: "SF Pro Text", system-ui, -apple-system, sans-serif;
+    --body-sm-font-size: 11px;  --body-sm-line-height: 16px;
+    --body-sm-strong-font-size: 11px; --body-sm-strong-font-weight: 500;
+    --body-base-font-family: "SF Pro Text", system-ui, -apple-system, sans-serif;
+    --body-base-font-size: 13px; --body-base-line-height: 20px;
+
+    --heading-md-font-family: "SF Pro", system-ui, -apple-system, sans-serif;
+    --heading-md-font-size: 20px; --heading-md-font-weight: 600; --heading-md-line-height: 28px;
+    --heading-3xl-font-family: "SF Pro", system-ui, -apple-system, sans-serif;
+    --heading-3xl-font-size: 32px; --heading-3xl-font-weight: 600; --heading-3xl-line-height: 40px;
+
+    --code-editor-font-family: "JetBrains Mono", ui-monospace, monospace;
+    --code-editor-font-size: 13px;
+
+    /* bg */
+    --bg-base-default: #1A1B1D;
+    --bg-base-secondary: #222427;
+    --bg-base-tertiary: #2A2D31;
+    --bg-overlay-l1: rgba(224, 226, 242, 0.04);
+    --bg-overlay-l2: rgba(224, 226, 242, 0.06);
+    --bg-overlay-l3: rgba(224, 226, 242, 0.08);
+    --bg-overlay-l4: rgba(224, 226, 242, 0.12);
+    --bg-tooltip: #1A1B1D;
+
+    /* brand */
+    --bg-brand: #32F08C;
+    --bg-brand-hover: #0FDC78;
+    --bg-brand-disabled: rgba(50, 240, 140, 0.2);
+    --bg-brand-popup: rgba(50, 240, 140, 0.12);
+
+    /* text */
+    --text-default: #D1D3DB;
+    --text-default-hover: #F5F9FE;
+    --text-secondary: #9599A6;
+    --text-tertiary: #666B75;
+    --text-disabled: #666B75;
+    --text-onbrand: #0C0C0D;
+    --text-brand: #32F08C;
+
+    /* icon */
+    --icon-secondary: #9599A6;
+    --icon-tertiary: #666B75;
+
+    /* border */
+    --border-neutral-l1: rgba(224, 226, 242, 0.1);
+    --border-neutral-l2: rgba(224, 226, 242, 0.16);
+    --border-neutral-l3: rgba(224, 226, 242, 0.2);
+    --border-contrast: #FFFFFF;
+    --border-brand: #32F08C;
+
+    /* accent */
+    --accent-teal: #2DD288;
+    --accent-amber: #DCB364;
+    --accent-cyan: #04CBE5;
+    --accent-blue: #7BB8FF;
+
+    /* status */
+    --status-primary-default: #387BFF;
+    --status-primary-surface-l1: rgba(53, 121, 255, 0.18);
+    --status-success-default: #33C192;
+    --status-success-surface-l1: rgba(0, 165, 110, 0.18);
+    --status-alert-default: #D29D00;
+    --status-alert-surface-l1: rgba(210, 157, 0, 0.16);
+    --status-warning-default: #D27E24;
+    --status-warning-surface-l1: rgba(210, 126, 36, 0.16);
+    --status-error-default: #F65A5A;
+    --status-error-surface-l1: rgba(246, 70, 70, 0.18);
+
+    /* brand palette (green) */
+    --brand-green-400: #5CF5A8;
+    --brand-green-900: #02743B;
+    --brand-green-1000: #004D26;
+    --brand-blue-1000: #00284D;
+
+    --brand-yellow-500: #FFD080;
+    --special-white: #FFFFFF;
+
+    /* page-local derived（基于 token，无裸 hex） */
+    --glow-brand: color-mix(in srgb, var(--bg-brand) 45%, transparent);
+    --glow-brand-soft: color-mix(in srgb, var(--bg-brand) 16%, transparent);
+    --gold-grad: linear-gradient(180deg, var(--brand-yellow-500), var(--accent-amber));
+    --glow-gold: color-mix(in srgb, var(--brand-yellow-500) 55%, transparent);
+    --glow-gold-soft: color-mix(in srgb, var(--brand-yellow-500) 18%, transparent);
+  }
+
+  /* ============================================================
+   *  组件（内联自 components.css 的 .ds-* 子集 + shared atoms）
+   * ============================================================ */
+  .ds-btn {
+    display: inline-flex; align-items: center; justify-content: center;
+    gap: var(--spacer-6);
+    padding: 0 var(--spacer-12); height: 28px;
+    border-radius: var(--radius-4);
+    border: 1px solid transparent;
+    cursor: pointer; user-select: none; white-space: nowrap;
+    font-family: var(--body-sm-strong-font-family);
+    font-size: var(--body-sm-strong-font-size);
+    line-height: 1;
+    font-weight: var(--body-sm-strong-font-weight);
+    transition: background .12s ease, color .12s ease, border-color .12s ease, box-shadow .2s ease, transform .15s ease, opacity .12s ease;
+  }
+  .ds-btn--secondary { background: var(--bg-overlay-l2); color: var(--text-default); border-color: var(--border-neutral-l1); }
+  .ds-btn--secondary:hover { background: var(--bg-overlay-l3); border-color: var(--border-neutral-l2); }
+  .ds-btn--secondary:active { background: var(--bg-overlay-l1); }
+
+  /* BRAND — 全页仅此一个品牌按钮 */
+  .ds-btn--brand { background: var(--bg-brand); color: var(--text-onbrand); border-color: var(--bg-brand); }
+  .ds-btn--brand:hover { background: var(--bg-brand-hover); border-color: var(--bg-brand-hover); }
+  .ds-btn--brand:active { filter: brightness(0.92); }
+  .ds-btn--brand[disabled] { background: var(--bg-brand-disabled); border-color: transparent; color: var(--text-tertiary); cursor: not-allowed; animation: none; }
+
+  .ds-btn:disabled { cursor: not-allowed; }
+  .ds-btn--secondary[disabled] { color: var(--text-tertiary); cursor: not-allowed; opacity: .6; }
+
+  .ds-tag {
+    display: inline-flex; align-items: center; gap: var(--spacer-6);
+    padding: 0 var(--spacer-8); height: 22px;
+    border-radius: var(--radius-4);
+    font-size: var(--body-xs-font-size); line-height: 1;
+    background: var(--bg-overlay-l2); color: var(--text-secondary);
+    border: 1px solid var(--border-neutral-l1);
+    transition: opacity .3s ease;
+  }
+  .ds-tag--brand { background: var(--bg-brand-popup); color: var(--text-brand); border-color: transparent; }
+
+  /* atoms */
+  .eyebrow {
+    display: inline-flex; align-items: center; gap: var(--spacer-8);
+    font-size: var(--body-xs-font-size); line-height: var(--body-xs-line-height);
+    color: var(--text-brand); text-transform: uppercase; letter-spacing: 0.22em;
+  }
+  .eyebrow::before, .eyebrow::after { content: ""; width: 26px; height: 1px; }
+  .eyebrow::before { background: linear-gradient(90deg, transparent, var(--border-brand)); }
+  .eyebrow::after { background: linear-gradient(90deg, var(--border-brand), transparent); }
+  .mono, .num { font-family: var(--code-editor-font-family); font-variant-numeric: tabular-nums; font-feature-settings: "tnum" 1, "lnum" 1; }
+
+  /* ============================================================
+   *  页面
+   * ============================================================ */
+  *, *::before, *::after { box-sizing: border-box; }
+  html, body { height: 100%; }
+  body {
+    margin: 0;
+    background: var(--bg-base-default);
+    color: var(--text-default);
+    font-family: var(--body-base-font-family);
+    font-size: var(--body-base-font-size);
+    line-height: var(--body-base-line-height);
+    -webkit-font-smoothing: antialiased;
+    overflow: hidden;
+  }
+
+  /* —— 背景装饰：极光光晕 + 代码网格 + 暗角 —— */
+  body::after {
+    content: ""; position: fixed; inset: 0; z-index: 0; pointer-events: none;
+    background: radial-gradient(ellipse 85% 70% at 50% 40%, transparent 42%, rgba(0, 0, 0, .55) 100%);
+  }
+  .orb { position: fixed; z-index: 0; border-radius: var(--radius-full); pointer-events: none; filter: blur(110px); }
+  .orb-brand { width: 48vw; height: 48vw; left: -8vw; top: -12vw; background: var(--brand-green-900); opacity: .45; animation: drift1 24s ease-in-out infinite alternate; }
+  .orb-blue  { width: 44vw; height: 44vw; right: -10vw; bottom: -16vw; background: var(--brand-blue-1000); opacity: .6; animation: drift2 28s ease-in-out infinite alternate; }
+  .orb-gold  { width: 30vw; height: 30vw; right: 6vw; top: -10vw; background: var(--status-alert-default); opacity: .12; animation: drift1 32s ease-in-out infinite alternate; }
+  @keyframes drift1 { from { transform: translate3d(0, 0, 0) scale(1); } to { transform: translate3d(4vw, 3vh, 0) scale(1.14); } }
+  @keyframes drift2 { from { transform: translate3d(0, 0, 0) scale(1.1); } to { transform: translate3d(-4vw, -3vh, 0) scale(1); } }
+  .bg-grid {
+    position: fixed; inset: 0; z-index: 0; pointer-events: none;
+    background-image:
+      linear-gradient(var(--border-neutral-l1) 1px, transparent 1px),
+      linear-gradient(90deg, var(--border-neutral-l1) 1px, transparent 1px);
+    background-size: 46px 46px;
+    -webkit-mask-image: radial-gradient(ellipse 70% 58% at 50% 40%, #000 18%, transparent 76%);
+            mask-image: radial-gradient(ellipse 70% 58% at 50% 40%, #000 18%, transparent 76%);
+    opacity: .5;
+  }
+
+  .app {
+    position: relative; z-index: 1;
+    height: 100vh;
+    display: grid;
+    grid-template-rows: auto 1fr auto auto;
+    gap: 1.4vh;
+    padding: 3vh clamp(20px, 4vw, 56px) 2.6vh;
+  }
+
+  /* —— 头部 —— */
+  header { text-align: center; }
+  .title {
+    margin: var(--spacer-8) 0 0;
+    font-family: var(--heading-3xl-font-family);
+    font-size: clamp(34px, 4.8vw, 62px);
+    line-height: 1.05;
+    font-weight: var(--heading-3xl-font-weight);
+    letter-spacing: -0.03em;
+    color: var(--text-default-hover);
+  }
+  .title .accent {
+    background: linear-gradient(180deg, var(--bg-brand), var(--brand-green-400));
+    -webkit-background-clip: text; background-clip: text;
+    -webkit-text-fill-color: transparent; color: transparent;
+    filter: drop-shadow(0 0 28px var(--glow-brand));
+  }
+
+  /* —— 舞台 —— */
+  .stage { display: grid; place-items: center; min-height: 0; }
+  .roll-card {
+    position: relative;
+    width: min(94vw, 1000px);
+    padding: clamp(30px, 4.8vh, 56px) clamp(28px, 5vw, 72px);
+    border-radius: var(--radius-10);
+    background:
+      radial-gradient(ellipse 72% 130% at 50% 0%, var(--bg-brand-popup), transparent 68%),
+      linear-gradient(180deg, var(--bg-base-secondary), var(--bg-base-default));
+    border: 1px solid var(--border-neutral-l1);
+    box-shadow: 0 1px 0 var(--bg-overlay-l3) inset, 0 40px 90px rgba(0, 0, 0, .5);
+    text-align: center;
+    overflow: hidden;
+    transition: border-color .25s ease, box-shadow .25s ease;
+  }
+  .roll-card::before {
+    content: ""; position: absolute; left: 50%; top: 0; transform: translateX(-50%);
+    width: 58%; height: 1px;
+    background: linear-gradient(90deg, transparent, var(--border-brand), transparent);
+    opacity: .7;
+  }
+  .roll-card.is-rolling {
+    border-color: var(--border-brand);
+    box-shadow: 0 0 0 1px var(--glow-brand-soft), 0 0 130px var(--glow-brand-soft), 0 40px 90px rgba(0, 0, 0, .5);
+  }
+  .roll-card.is-rolling::after {
+    content: ""; position: absolute; inset: 0; pointer-events: none;
+    background: linear-gradient(115deg, transparent 42%, var(--bg-brand-popup) 50%, transparent 58%);
+    background-size: 260% 260%;
+    animation: sweep 1.15s linear infinite;
+  }
+  @keyframes sweep { from { background-position: 160% 0; } to { background-position: -60% 0; } }
+  .roll-tag { margin-bottom: clamp(12px, 2vh, 22px); }
+  .roll-tag .live-dot {
+    width: 6px; height: 6px; border-radius: var(--radius-full);
+    background: currentColor; display: inline-block;
+  }
+  .roll-tag.is-idle .live-dot { animation: blink 1.4s ease-in-out infinite; }
+  @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: .25; } }
+
+  .roll-name {
+    font-family: var(--heading-3xl-font-family);
+    font-weight: var(--heading-3xl-font-weight);
+    font-size: clamp(62px, 9.8vw, 152px);
+    line-height: 1.06;
+    letter-spacing: -0.02em;
+    color: var(--text-default);
+    min-height: 1.1em;
+    transition: color .2s ease, opacity .2s ease;
+  }
+  .roll-card.is-rolling .roll-name { color: var(--text-secondary); }
+  .roll-name.is-win {
+    background: var(--gold-grad);
+    -webkit-background-clip: text; background-clip: text;
+    -webkit-text-fill-color: transparent; color: transparent;
+    filter: drop-shadow(0 0 64px var(--glow-gold));
+    animation: pop .55s cubic-bezier(.2, 1.4, .4, 1);
+  }
+  /* 一组多人：在中央一起亮出（金色徽章） */
+  .roll-name.is-batch {
+    display: flex; flex-wrap: wrap; align-items: center; justify-content: center;
+    gap: clamp(10px, 1.4vw, 20px);
+    font-size: clamp(26px, 3vw, 44px);
+    line-height: 1.2;
+    background: none;
+    -webkit-text-fill-color: currentColor;
+  }
+  .roll-name.is-batch > span {
+    padding: 0.32em 0.78em;
+    border-radius: var(--radius-8);
+    background: linear-gradient(180deg,
+      color-mix(in srgb, var(--brand-yellow-500) 22%, var(--bg-base-secondary)),
+      color-mix(in srgb, var(--accent-amber) 9%, var(--bg-base-secondary)));
+    border: 1px solid color-mix(in srgb, var(--brand-yellow-500) 55%, transparent);
+    color: var(--brand-yellow-500);
+    box-shadow: 0 0 0 1px var(--glow-gold-soft), 0 12px 34px var(--glow-gold-soft);
+    animation: pop .5s cubic-bezier(.2, 1.4, .4, 1) both;
+  }
+  @keyframes pop {
+    0% { transform: scale(.72); opacity: .3; }
+    60% { transform: scale(1.06); }
+    100% { transform: scale(1); }
+  }
+  .roll-hint {
+    margin-top: clamp(12px, 2vh, 22px);
+    font-size: var(--body-sm-font-size);
+    line-height: var(--body-sm-line-height);
+    letter-spacing: 0.16em;
+    color: var(--text-tertiary);
+  }
+
+  /* —— 中奖墙 —— */
+  .winners-head {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: var(--spacer-12);
+  }
+  .winners-head .label {
+    display: inline-flex; align-items: center; gap: var(--spacer-8);
+    font-size: var(--body-sm-strong-font-size);
+    font-weight: var(--body-sm-strong-font-weight);
+    letter-spacing: 0.14em;
+    color: var(--text-secondary);
+  }
+  .winners-head .label::before {
+    content: ""; width: 3px; height: 13px; border-radius: var(--radius-full);
+    background: var(--bg-brand); box-shadow: 0 0 10px var(--glow-brand);
+  }
+  .winners-head .count { font-size: var(--body-sm-font-size); color: var(--text-tertiary); }
+  .winners-head .count b { color: var(--text-default); font-weight: var(--font-weight-medium); }
+
+  .groups {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: var(--spacer-16);
+    align-items: start;
+  }
+  @media (max-width: 760px) { .groups { grid-template-columns: repeat(2, 1fr); } }
+
+  .group { display: flex; flex-direction: column; gap: var(--spacer-8); }
+  .group-head {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 0 var(--spacer-4);
+  }
+  .group-head .g-name {
+    display: inline-flex; align-items: center; gap: var(--spacer-6);
+    font-size: var(--body-sm-strong-font-size);
+    font-weight: var(--body-sm-strong-font-weight);
+    letter-spacing: 0.04em;
+    color: var(--text-tertiary);
+    transition: color .25s ease;
+  }
+  .group-head .dot {
+    width: 6px; height: 6px; border-radius: var(--radius-full);
+    background: var(--border-neutral-l3);
+    transition: background .25s ease, box-shadow .25s ease;
+  }
+  .group-head.active .g-name { color: var(--text-default); }
+  .group-head.active .dot {
+    background: var(--bg-brand);
+    box-shadow: 0 0 10px var(--glow-brand);
+  }
+  .group-head .g-count { font-size: var(--body-xs-font-size); color: var(--text-tertiary); }
+
+  .group-slots { display: flex; flex-direction: column; gap: var(--spacer-8); }
+  /* 翻牌：.slot 是 3D 舞台，.flip 旋转，正反面各一张卡 */
+  .slot {
+    position: relative;
+    height: clamp(42px, 5vh, 66px);
+    perspective: 700px;
+  }
+  .flip {
+    position: relative; width: 100%; height: 100%;
+    transform-style: preserve-3d;
+    transition: transform .68s cubic-bezier(.4, .15, .2, 1);
+  }
+  .slot.is-filled .flip { transform: rotateY(180deg); }
+
+  .face {
+    position: absolute; inset: 0;
+    display: grid; place-items: center;
+    border-radius: var(--radius-6);
+    -webkit-backface-visibility: hidden; backface-visibility: hidden;
+    overflow: hidden;
+    font-size: clamp(15px, 1.5vw, 21px);
+    font-weight: var(--font-weight-medium);
+  }
+  .face .idx {
+    position: absolute; top: 7px; left: 9px;
+    font-family: var(--code-editor-font-family);
+    font-size: 10px; line-height: 1;
+    color: var(--text-tertiary);
+  }
+  /* 背面：未揭晓 */
+  .face-back {
+    border: 1px dashed var(--border-neutral-l2);
+    background: var(--bg-overlay-l1);
+    color: var(--text-tertiary);
+  }
+  /* 正面：中奖 */
+  .face-front {
+    transform: rotateY(180deg);
+    border: 1px solid color-mix(in srgb, var(--brand-yellow-500) 62%, transparent);
+    color: var(--brand-yellow-500);
+    background: linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--brand-yellow-500) 20%, var(--bg-base-secondary)),
+      color-mix(in srgb, var(--accent-amber) 8%, var(--bg-base-secondary))
+    );
+    box-shadow: 0 0 0 1px var(--glow-gold-soft), 0 10px 30px var(--glow-gold-soft);
+    font-weight: var(--font-weight-strong);
+  }
+  .face-front .idx { color: var(--brand-yellow-500); opacity: .6; }
+  /* 翻到正面后掠过的高光 */
+  .slot.is-filled .face-front::after {
+    content: ""; position: absolute; top: 0; left: -60%; width: 40%; height: 100%;
+    background: linear-gradient(100deg, transparent, color-mix(in srgb, var(--special-white) 38%, transparent), transparent);
+    transform: skewX(-18deg);
+    animation: shine .9s ease .34s 1 both;
+  }
+  @keyframes shine { to { left: 130%; } }
+
+  /* —— 控制区 —— */
+  .controls {
+    display: flex; justify-content: center; align-items: center;
+    gap: var(--spacer-16);
+    padding-top: 0.4vh;
+  }
+  .ds-btn--stage {
+    height: clamp(48px, 6.4vh, 64px);
+    padding: 0 clamp(var(--spacer-32), 4vw, var(--spacer-40));
+    border-radius: var(--radius-8);
+    font-family: var(--heading-md-font-family);
+    font-size: clamp(16px, 1.5vw, 22px);
+    font-weight: var(--heading-md-font-weight);
+    letter-spacing: 0.08em;
+  }
+  .ds-btn--stage.ds-btn--brand { box-shadow: 0 0 0 1px var(--glow-brand-soft), 0 14px 34px var(--glow-brand-soft); }
+  .ds-btn--stage.ds-btn--brand:hover { box-shadow: 0 0 0 1px var(--glow-brand-soft), 0 16px 44px var(--glow-brand); }
+  .ds-btn--brand.is-rolling { animation: breathe 1.1s ease-in-out infinite; }
+  @keyframes breathe {
+    0%, 100% { transform: scale(1); box-shadow: 0 0 0 0 var(--glow-brand); }
+    50% { transform: scale(1.04); box-shadow: 0 0 30px var(--glow-brand); }
+  }
+
+  /* —— 礼花画布 —— */
+  #fx { position: fixed; inset: 0; z-index: 3; pointer-events: none; }
+
+  /* —— 左侧参与名单栏 —— */
+  .rail-toggle {
+    position: fixed; z-index: 6;
+    left: clamp(16px, 2.4vw, 28px); top: clamp(16px, 2.6vh, 26px);
+    height: 34px; padding: 0 var(--spacer-12); gap: var(--spacer-6);
+    border-radius: var(--radius-8);
+    -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px);
+    transition: opacity .25s ease, background .12s ease, border-color .12s ease;
+  }
+  .rail-toggle.is-hidden { opacity: 0; pointer-events: none; }
+
+  .scrim {
+    position: fixed; inset: 0; z-index: 4;
+    background: rgba(0, 0, 0, .52);
+    opacity: 0; pointer-events: none;
+    transition: opacity .3s ease;
+  }
+  .scrim.is-open { opacity: 1; pointer-events: auto; }
+
+  .sidebar {
+    position: fixed; left: 0; top: 0; bottom: 0; z-index: 5;
+    width: min(92vw, 620px);
+    display: flex; flex-direction: column;
+    background: linear-gradient(180deg, var(--bg-base-secondary), var(--bg-base-default));
+    border-right: 1px solid var(--border-neutral-l1);
+    box-shadow: 40px 0 90px rgba(0, 0, 0, .55);
+    transform: translateX(-102%);
+    transition: transform .34s cubic-bezier(.4, .15, .2, 1), width .34s cubic-bezier(.4, .15, .2, 1);
+  }
+  .sidebar.is-open { transform: translateX(0); }
+  /* 全屏展开 */
+  .sidebar.is-wide { width: 100vw; border-right: none; }
+
+  .sidebar-head {
+    display: flex; align-items: flex-start; justify-content: space-between;
+    gap: var(--spacer-12);
+    padding: var(--spacer-16) var(--spacer-16) var(--spacer-12);
+    border-bottom: 1px solid var(--border-neutral-l1);
+  }
+  .sidebar-head .sb-title {
+    font-family: var(--heading-md-font-family);
+    font-size: 24px;
+    font-weight: var(--heading-md-font-weight);
+    color: var(--text-default-hover);
+  }
+  .sidebar-head .sb-sub { margin-top: 4px; font-size: 15px; color: var(--text-tertiary); }
+  .sidebar-head .sb-sub b { color: var(--text-default); font-weight: var(--font-weight-medium); }
+  .sb-actions { display: flex; gap: var(--spacer-8); flex: none; }
+  .sb-close { width: 34px; height: 34px; padding: 0; font-size: 14px; flex: none; }
+
+  .sb-stats {
+    display: flex; gap: var(--spacer-24);
+    padding: var(--spacer-16);
+    border-bottom: 1px solid var(--border-neutral-l1);
+    font-size: 15px; color: var(--text-tertiary);
+  }
+  .sb-stats b { color: var(--text-default); font-weight: var(--font-weight-medium); font-size: 18px; }
+
+  .sb-list {
+    flex: 1; overflow-y: auto;
+    padding: var(--spacer-16) var(--spacer-16) 28px;
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: var(--spacer-12); align-content: start;
+  }
+  .sidebar.is-wide .sb-list { grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); }
+  .sb-list::-webkit-scrollbar { width: 10px; }
+  .sb-list::-webkit-scrollbar-thumb { background: var(--border-neutral-l2); border-radius: var(--radius-full); }
+  .sb-item {
+    padding: 13px 16px; border-radius: var(--radius-8);
+    background: var(--bg-overlay-l1); border: 1px solid var(--border-neutral-l1);
+    font-size: clamp(17px, 1.7vw, 23px); line-height: 1.3;
+    color: var(--text-secondary);
+    text-align: center; word-break: keep-all; overflow-wrap: break-word;
+    transition: background .2s ease, color .2s ease, border-color .2s ease;
+  }
+  .sb-item.is-won {
+    background: linear-gradient(180deg,
+      color-mix(in srgb, var(--brand-yellow-500) 22%, transparent),
+      color-mix(in srgb, var(--accent-amber) 9%, transparent));
+    border-color: color-mix(in srgb, var(--brand-yellow-500) 55%, transparent);
+    color: var(--brand-yellow-500);
+    font-weight: var(--font-weight-strong);
+  }
+</style>
+</head>
+<body>
+  <div class="bg-grid"></div>
+  <div class="orb orb-brand"></div>
+  <div class="orb orb-blue"></div>
+  <div class="orb orb-gold"></div>
+
+  <button class="ds-btn ds-btn--secondary rail-toggle" id="railToggle" aria-label="查看参与名单" aria-expanded="false">
+    <svg width="15" height="15" viewBox="0 0 15 15" fill="none" aria-hidden="true">
+      <path d="M2 4h11M2 7.5h11M2 11h7" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" />
+    </svg>
+    <span>名单</span>
+  </button>
+
+  <div class="scrim" id="scrim"></div>
+
+  <aside class="sidebar" id="sidebar" aria-hidden="true">
+    <div class="sidebar-head">
+      <div>
+        <div class="sb-title">参与名单</div>
+        <div class="sb-sub">共 <b class="mono num" id="sbTotal">0</b> 位候选</div>
+      </div>
+      <div class="sb-actions">
+        <button class="ds-btn ds-btn--secondary sb-close" id="railExpand" aria-label="全屏展开">
+          <svg width="15" height="15" viewBox="0 0 15 15" fill="none" aria-hidden="true">
+            <path d="M6 2H2v4M9 13h4V9M2 2l4.4 4.4M13 13l-4.4-4.4" stroke="currentColor" stroke-width="1.4"
+              stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+        </button>
+        <button class="ds-btn ds-btn--secondary sb-close" id="railClose" aria-label="关闭">✕</button>
+      </div>
+    </div>
+    <div class="sb-stats">
+      <span>已中奖 <b class="mono num" id="sbWon">0</b></span>
+      <span>待抽取 <b class="mono num" id="sbLeft">0</b></span>
+    </div>
+    <div class="sb-list" id="sbList"></div>
+  </aside>
+
+  <div class="app">
+    <header>
+      <div class="eyebrow">Trae on Campus</div>
+      <h1 class="title">幸运<span class="accent">抽奖</span></h1>
+    </header>
+
+    <main class="stage">
+      <div class="roll-card" id="rollCard">
+        <span class="ds-tag ds-tag--brand roll-tag is-idle" id="rollTag">
+          <span class="live-dot"></span><span id="rollTagText">第 1 组 · 0/5</span>
+        </span>
+        <div class="roll-name" id="rollName">准备开始</div>
+        <div class="roll-hint" id="rollHint">点击下方按钮，开始抽奖</div>
+      </div>
+    </main>
+
+    <section class="winners">
+      <div class="winners-head">
+        <span class="label">中奖名单</span>
+        <span class="count mono num"><b id="progress">0</b> / <b id="total">10</b> 位</span>
+      </div>
+      <div class="groups" id="groups"></div>
+    </section>
+
+    <footer class="controls">
+      <button class="ds-btn ds-btn--brand ds-btn--stage" id="drawBtn">开始抽奖</button>
+      <button class="ds-btn ds-btn--secondary ds-btn--stage" id="resetBtn">重置</button>
+    </footer>
+  </div>
+
+  <canvas id="fx"></canvas>
+
+<script>
+/* ============================================================
+ *  1) 参与名单 —— 换成真实名单直接改这里（一行一个名字）
+ * ============================================================ */
+const PARTICIPANTS = [
+  "赵彦韬","郭朕轩","殷子熙","田成山","胡全旭","梁景涵","黎姿","梁雨田","于万鹏","韩雨欣",
+  "郭子杨","陈欣阳","刘文帅","牛奕翔","蒋瑞绮","邱雨欣","田梓润","李雨轩","梁维泽","王海冉",
+  "高鸿举","柠妤","李思钰","贾霈茜","董晓","杨维维","刘羽熙","王钧莳","宋源蕊","晏娟婷",
+  "叶诗龙","杨文华","曾桂钰","冯浩翔","彭嘉嘉","尹思","付佳慧","金子航","王全坤","安锦源",
+  "张曦杰","冷涛","周梦涵","陈楠","骆慧锜","刘湘雨","郜恩美","余星云","谢梦圆","毛卓立",
+  "祝芷萱","沈嘉诚","吴婧柔","佟佳","张梦冉","袁智","韩抒璇","林萍","何明函","黄官琴",
+  "王雨羲","董奕奕","万兴旺","王晟瑜","时佳","姚正昌","黄佳睿","魏娜","徐翔千","游欣怡",
+  "芭L卢","杜皓男","韩彦平","孟璐","应锦程","张崇健","谢欣芮","韩思涵","曾新","刘敏",
+  "张雨凝","王一梦","冯梓涵","刘雨鑫","赖姝妤","吴思颖","韩天佑","邱浩","刘昱辰","盛子锝",
+  "刘昊普","马加世豪","王思睿","朱美晨","罗琪琪","尹娜莹","刘可","袁锦浩","纪岑","卢晶",
+  "赵鸿天","杨文达","王富超","曾靖懿","张浩宸","温敬博","徐嘉","郑晶晶","卓子建","陈宇华",
+  "任万里","满玥然","崔屿涵","张佳丽","尹菲菲","马梦颖","赵睿函","王芷","宋子智","王宇阳",
+  "李嘉乐","屈政宇","杨明可","马尚海","尹瑞兴","周博阳","柳玥","吴鸿怡","刘子琪","苏畅",
+  "周欣仪","王佳怡","郭馨悦","卢艾玲","王舟扬","林鑫灏","刘承基","刘瀚博","薛雯卿"
+];
+
+/* ============================================================
+ *  2) 配置 —— 4 组，人数即抽取顺序：先 5、再 3、再 1、再 1
+ * ============================================================ */
+const GROUPS = [
+  { label: "第 1 组", count: 5 },
+  { label: "第 2 组", count: 3 },
+  { label: "第 3 组", count: 1 },
+  { label: "第 4 组", count: 1 },
+];
+const TOTAL_WINNERS = GROUPS.reduce((sum, g) => sum + g.count, 0);
+const ROLL_INTERVAL = 55;
+
+/* ============================================================
+ *  3) 状态与元素
+ * ============================================================ */
+const el = {
+  card: document.getElementById("rollCard"),
+  tag: document.getElementById("rollTag"),
+  tagText: document.getElementById("rollTagText"),
+  name: document.getElementById("rollName"),
+  hint: document.getElementById("rollHint"),
+  groups: document.getElementById("groups"),
+  progress: document.getElementById("progress"),
+  total: document.getElementById("total"),
+  drawBtn: document.getElementById("drawBtn"),
+  resetBtn: document.getElementById("resetBtn"),
+  fx: document.getElementById("fx"),
+};
+
+let winners = [];
+let groupWins = GROUPS.map(() => []);
+let curGroup = 0;
+let rolling = false;
+let timer = null;
+
+/* ============================================================
+ *  4) 初始化 / 重置
+ * ============================================================ */
+function remaining() {
+  const won = new Set(winners);
+  return PARTICIPANTS.filter((p) => !won.has(p));
+}
+
+function buildGroups() {
+  el.groups.innerHTML = "";
+  GROUPS.forEach((g, gi) => {
+    const wrap = document.createElement("div");
+    wrap.className = "group";
+
+    const head = document.createElement("div");
+    head.className = "group-head";
+    head.innerHTML =
+      '<span class="g-name"><span class="dot"></span>' + g.label + "</span>" +
+      '<span class="g-count mono num"><b>' + groupWins[gi].length + "</b> / " + g.count + "</span>";
+    wrap.appendChild(head);
+
+    const row = document.createElement("div");
+    row.className = "group-slots";
+    for (let i = 0; i < g.count; i++) {
+      const d = document.createElement("div");
+      d.className = "slot";
+      d.innerHTML =
+        '<div class="flip">' +
+          '<div class="face face-back"><span class="idx">#' + (i + 1) + "</span></div>" +
+          '<div class="face face-front"><span class="idx">#' + (i + 1) + '</span><span class="name"></span></div>' +
+        "</div>";
+      row.appendChild(d);
+    }
+    wrap.appendChild(row);
+    el.groups.appendChild(wrap);
+  });
+}
+
+function renderGroups() {
+  GROUPS.forEach((g, gi) => {
+    const wrap = el.groups.children[gi];
+    wrap.querySelector(".g-count b").textContent = groupWins[gi].length;
+    const slots = wrap.querySelectorAll(".slot");
+    for (let i = 0; i < g.count; i++) {
+      const node = slots[i];
+      const name = groupWins[gi][i];
+      node.querySelector(".face-front .name").textContent = name || "";
+      node.classList.toggle("is-filled", !!name);
+    }
+  });
+  el.progress.textContent = winners.length;
+  renderRoster();
+}
+
+function highlightActive() {
+  const done = winners.length >= TOTAL_WINNERS;
+  GROUPS.forEach((g, gi) => {
+    const head = el.groups.children[gi].querySelector(".group-head");
+    head.classList.toggle("active", !done && gi === curGroup);
+  });
+}
+
+function updateTag() {
+  const g = GROUPS[curGroup];
+  if (!g || winners.length >= TOTAL_WINNERS) { el.tag.style.opacity = "0"; return; }
+  el.tag.style.opacity = "1";
+  el.tagText.textContent = g.label + " · " + groupWins[curGroup].length + "/" + g.count;
+}
+
+function setIdle() {
+  el.card.classList.remove("is-rolling");
+  el.drawBtn.classList.remove("is-rolling");
+  const done = winners.length >= TOTAL_WINNERS;
+  el.drawBtn.disabled = done;
+  updateTag();
+  highlightActive();
+
+  if (done) {
+    el.drawBtn.textContent = "已抽完";
+    el.hint.textContent = "恭喜以上 " + TOTAL_WINNERS + " 位幸运儿 🎉";
+    return;
+  }
+
+  if (winners.length === 0) {
+    el.drawBtn.textContent = "开始抽奖";
+    el.hint.textContent = "点击下方按钮，开始抽奖";
+  } else {
+    el.drawBtn.textContent = "抽下一组";
+    const g = GROUPS[curGroup];
+    el.hint.textContent = g.label + " · 一次抽出 " + g.count + " 位";
+  }
+}
+
+function reset() {
+  stopRollTimer();
+  rolling = false;
+  winners = [];
+  groupWins = GROUPS.map(() => []);
+  curGroup = 0;
+  el.name.className = "roll-name";
+  el.name.textContent = "准备开始";
+  buildGroups();
+  renderGroups();
+  setIdle();
+}
+
+/* ============================================================
+ *  5) 抽奖流程
+ * ============================================================ */
+function startRoll() {
+  if (curGroup >= GROUPS.length) return;
+
+  const pool = remaining();
+  if (pool.length === 0) return;
+  rolling = true;
+  el.card.classList.add("is-rolling");
+  el.name.className = "roll-name";
+  el.drawBtn.classList.add("is-rolling");
+  el.drawBtn.textContent = "停 ！";
+  el.hint.textContent = GROUPS[curGroup].label + " · 名单滚动中，点击定格";
+  updateTag();
+  highlightActive();
+
+  timer = setInterval(() => {
+    const p = pool[Math.floor(Math.random() * pool.length)];
+    el.name.textContent = p;
+  }, ROLL_INTERVAL);
+}
+
+function stopRollTimer() {
+  if (timer) { clearInterval(timer); timer = null; }
+}
+
+function stopRoll() {
+  stopRollTimer();
+  rolling = false;
+  el.card.classList.remove("is-rolling");
+
+  // 本组一次性抽出全部名额（不重复）
+  const n = GROUPS[curGroup].count;
+  const pool = remaining();
+  const picked = [];
+  for (let i = 0; i < n && pool.length > 0; i++) {
+    picked.push(pool.splice(Math.floor(Math.random() * pool.length), 1)[0]);
+  }
+  if (picked.length === 0) { setIdle(); return; }
+
+  picked.forEach((p) => {
+    winners.push(p);
+    groupWins[curGroup].push(p);
+  });
+
+  showBatch(picked);
+  renderGroups();
+  burst();
+
+  curGroup++;   // 本组已完成，指向下一组
+  setIdle();
+}
+
+// 在中央一起亮出本组中奖者
+function showBatch(names) {
+  el.name.className = "roll-name is-win" + (names.length > 1 ? " is-batch" : "");
+  if (names.length > 1) {
+    el.name.innerHTML = names.map((n) => "<span>" + n + "</span>").join("");
+  } else {
+    el.name.textContent = names[0];
+  }
+}
+
+el.drawBtn.addEventListener("click", () => {
+  if (el.drawBtn.disabled) return;
+  if (!rolling) startRoll();
+  else stopRoll();
+});
+
+el.resetBtn.addEventListener("click", reset);
+
+/* ============================================================
+ *  6) 礼花特效（颜色取自设计 token）
+ * ============================================================ */
+const ctx = el.fx.getContext("2d");
+const cssVar = (n) => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const FX_COLORS = [
+  cssVar("--brand-yellow-500"), cssVar("--accent-amber"), cssVar("--bg-brand"),
+  cssVar("--brand-green-400"), cssVar("--status-primary-default"),
+  cssVar("--accent-cyan"), cssVar("--special-white"),
+];
+
+let particles = [];
+let fxRunning = false;
+
+function resize() { el.fx.width = window.innerWidth; el.fx.height = window.innerHeight; }
+window.addEventListener("resize", resize);
+resize();
+
+function burst() {
+  const cx = window.innerWidth / 2;
+  const cy = window.innerHeight * 0.4;
+  for (let i = 0; i < 140; i++) {
+    const angle = Math.random() * Math.PI * 2;
+    const speed = 4 + Math.random() * 11;
+    particles.push({
+      x: cx + (Math.random() - 0.5) * 240,
+      y: cy + (Math.random() - 0.5) * 70,
+      vx: Math.cos(angle) * speed,
+      vy: Math.sin(angle) * speed - 4,
+      size: 3 + Math.random() * 5,
+      color: FX_COLORS[(Math.random() * FX_COLORS.length) | 0],
+      life: 1,
+      decay: 0.012 + Math.random() * 0.012,
+      rot: Math.random() * Math.PI,
+      vr: (Math.random() - 0.5) * 0.3,
+    });
+  }
+  if (!fxRunning) { fxRunning = true; requestAnimationFrame(tick); }
+}
+
+function tick() {
+  ctx.clearRect(0, 0, el.fx.width, el.fx.height);
+  particles = particles.filter((p) => p.life > 0);
+  for (const p of particles) {
+    p.vy += 0.32;
+    p.vx *= 0.99;
+    p.x += p.vx;
+    p.y += p.vy;
+    p.life -= p.decay;
+    p.rot += p.vr;
+    ctx.save();
+    ctx.globalAlpha = Math.max(p.life, 0);
+    ctx.translate(p.x, p.y);
+    ctx.rotate(p.rot);
+    ctx.fillStyle = p.color;
+    ctx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size * 0.6);
+    ctx.restore();
+  }
+  if (particles.length > 0) requestAnimationFrame(tick);
+  else { fxRunning = false; ctx.clearRect(0, 0, el.fx.width, el.fx.height); }
+}
+
+/* ============================================================
+ *  7) 左侧参与名单栏
+ * ============================================================ */
+const railToggle = document.getElementById("railToggle");
+const railClose = document.getElementById("railClose");
+const railExpand = document.getElementById("railExpand");
+const sidebar = document.getElementById("sidebar");
+const scrim = document.getElementById("scrim");
+const sbList = document.getElementById("sbList");
+
+function setRail(open) {
+  sidebar.classList.toggle("is-open", open);
+  scrim.classList.toggle("is-open", open);
+  railToggle.classList.toggle("is-hidden", open);
+  railToggle.setAttribute("aria-expanded", open ? "true" : "false");
+  sidebar.setAttribute("aria-hidden", open ? "false" : "true");
+}
+
+function buildRoster() {
+  sbList.innerHTML = "";
+  PARTICIPANTS.forEach((name) => {
+    const d = document.createElement("div");
+    d.className = "sb-item";
+    d.dataset.name = name;
+    d.textContent = name;
+    sbList.appendChild(d);
+  });
+  document.getElementById("sbTotal").textContent = PARTICIPANTS.length;
+}
+
+function renderRoster() {
+  const won = new Set(winners);
+  sbList.querySelectorAll(".sb-item").forEach((n) => {
+    n.classList.toggle("is-won", won.has(n.dataset.name));
+  });
+  document.getElementById("sbWon").textContent = winners.length;
+  document.getElementById("sbLeft").textContent = Math.max(0, PARTICIPANTS.length - winners.length);
+}
+
+railToggle.addEventListener("click", () => setRail(true));
+railClose.addEventListener("click", () => setRail(false));
+scrim.addEventListener("click", () => setRail(false));
+window.addEventListener("keydown", (e) => { if (e.key === "Escape") setRail(false); });
+
+// 全屏展开 / 收起为侧栏
+railExpand.addEventListener("click", () => {
+  const wide = sidebar.classList.toggle("is-wide");
+  railExpand.setAttribute("aria-label", wide ? "收起为侧栏" : "全屏展开");
+});
+
+/* ============================================================
+ *  8) 启动
+ * ============================================================ */
+el.total.textContent = TOTAL_WINNERS;
+buildRoster();
+reset();
+</script>
+</body>
+</html>
